@@ -1,5 +1,5 @@
-Laboratorio 2 Computacion Grafica
-Vicente Santos
+Laboratorio 2 Computacion Grafica <br>
+Vicente Santos <br>
 Cristobal Gallardo
 -------------------------
 Compilacion y Ejecucion: python3 lab2.py
