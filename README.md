@@ -15,4 +15,3 @@ CPU: Ryzen 5 3600x
 RAM: 16 gb ram
 OS: Ubuntu 22.04.2
 
-#------------------
