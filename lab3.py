@@ -44,6 +44,8 @@ class Button:
         self.label.setFill("darkgrey")
         self.rect.setWidth(1)
         self.deactivated = True
+    def reinicio(self):
+        self.label = Text(center, labe)
 
 # Añade una lista para almacenar los elementos del personaje
 personaje_elementos = []
@@ -109,17 +111,22 @@ def Rotacion(win):
         draw_pixel(x * 2, y * 2, win, 2, "red")  # Dibujar cada punto en rojo
 
     
-def Traslacion(win, xc, xy, desplazamiento_x=0, desplazamiento_y=0, largo_personaje= -5):
-    print('\n Traslacion...')
-    ver_personaje_elementos()
+def Traslacion(win, xc, xy, desplazamiento_x=0, desplazamiento_y=0, largo_personaje=-5):
+    print('\n Traslacion usando vectores...')
+    
+    # Define el vector de posición inicial y de traslación
+    P = [xc, xy]
+    T_tr = [desplazamiento_x, desplazamiento_y]
+    
+    # Realiza la traslación sumando los vectores
+    P_prime = [P[0] + T_tr[0], P[1] + T_tr[1]]
+    nuevo_xc, nuevo_xy = P_prime
+    
+    # Redibuja el personaje en la nueva posición
     undraw_personaje(win)
-    xc_nuevo = xc + desplazamiento_x
-    xy_nuevo = xy + desplazamiento_y
-
-    nuevo_largo = largo_personaje + desplazamiento_y
-        
-    personaje(xc=xc_nuevo, xy=xy_nuevo, largo_cuerpo = nuevo_largo, win=win)
-    return xc_nuevo, xy_nuevo, nuevo_largo
+    personaje(xc=nuevo_xc, xy=nuevo_xy, largo_cuerpo=largo_personaje + desplazamiento_y, win=win)
+    
+    return nuevo_xc, nuevo_xy, largo_personaje + desplazamiento_y
     
 def Escalamiento(win):
     print('\n Escalamiento...')
@@ -237,6 +244,8 @@ def main():
                 escalamiento_button.activate()
                 escalamiento_button_plus.activate()
                 escalamiento_button_minus.activate()    
+                
+                
                 botones_activos = 1
                 
 
