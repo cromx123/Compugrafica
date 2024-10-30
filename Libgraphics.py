@@ -1005,6 +1005,13 @@ def test():
     win.getMouse()
     win.close()
 
+personaje_puntos = []  # Lista para almacenar puntos del personaje
+
+def get_personaje_puntos():
+    return personaje_puntos
+def vaciar_personaje():
+    global personaje_puntos
+    personaje_puntos = []
 
 def draw_pixel_grid(window, width, height, pixel_size):
     # Dibuja una cuadrícula de píxeles con el origen en el centro
@@ -1030,17 +1037,31 @@ def draw_pixel(x, y, window, pixel_size, color="black"):
     rect = Rectangle(Point(x, y), Point(x + pixel_size, y + pixel_size))
     rect.setFill(color)
     rect.draw(window)
+    
+def undraw_pixel(x, y, window, pixel_size=2):
+    rect = Rectangle(Point(x, y), Point(x + pixel_size, y + pixel_size))
+    rect.setFill("white")
+    rect.setOutline("white")
+    rect.draw(window)
 
 def PlotPoint(xc, yc, x, y, win, pixel_size):
     # Dibuja los puntos simétricos
     draw_pixel(xc + x, yc + y, win, pixel_size)
+    personaje_puntos.append((xc + x, yc + y))
     draw_pixel(xc - x, yc + y, win, pixel_size)
+    personaje_puntos.append((xc - x, yc + y))
     draw_pixel(xc + x, yc - y, win, pixel_size)
+    personaje_puntos.append((xc + x, yc - y))
     draw_pixel(xc - x, yc - y, win, pixel_size)
+    personaje_puntos.append((xc - x, yc - y))
     draw_pixel(xc + y, yc + x, win, pixel_size)
+    personaje_puntos.append((xc + y, yc + x))
     draw_pixel(xc - y, yc + x, win, pixel_size)
+    personaje_puntos.append((xc - y, yc + x))
     draw_pixel(xc + y, yc - x, win, pixel_size)
+    personaje_puntos.append((xc + y, yc - x))
     draw_pixel(xc - y, yc - x, win, pixel_size)
+    personaje_puntos.append((xc - y, yc - x))
 
 def LineaBresenham(x1, y1 , x2, y2, win, pixel_size):
     print("\nEntrando a Unir 2 puntos con una Recta")  
@@ -1061,6 +1082,7 @@ def LineaBresenham(x1, y1 , x2, y2, win, pixel_size):
         x, y = x1, y1
         while x != x2 or y != y2:
             draw_pixel(x * pixel_size, y * pixel_size, win, pixel_size)
+            personaje_puntos.append((x * pixel_size, y * pixel_size))
             if x == x2 and y == y2:  # Chequeo de finalización
                 break
             x += sx
@@ -1077,6 +1099,7 @@ def LineaBresenham(x1, y1 , x2, y2, win, pixel_size):
         x, y = x1, y1
         while x != x2 or y != y2:
             draw_pixel(x * pixel_size, y * pixel_size, win, pixel_size)
+            personaje_puntos.append((x * pixel_size, y * pixel_size))
             if x == x2 and y == y2:  # Chequeo de finalización
                 break
             y += sy

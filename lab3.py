@@ -7,9 +7,6 @@
 import math
 from Libgraphics import *
 
-# Lista global para almacenar puntos del personaje
-personaje_posterior = get_personaje_puntos() 
-personaje_anterior = []
 class Button:
     def __init__(self, win, center, width, height, label):
         """Inicializa el botón en la ventana gráfica `win` con el centro, ancho, alto y etiqueta."""
@@ -47,55 +44,50 @@ class Button:
         self.label.setFill("darkgrey")
         self.rect.setWidth(1)
         self.deactivated = True
-    
-    def cambiar_texto(self, win, center):
-        """Reinicia el personaje a su estado inicial"""
-        
-        self.label.undraw()
-        self.label = Text(center,"Reiniciar")
-        self.label.draw(win)
-        
-def limpiar_personaje(win, pixel_size):
-    global personaje_anterior
-    for x, y in personaje_anterior:
-        draw_pixel(x, y, win, pixel_size, color="white")  # Borrar el pixel anterior
-        print(f"Despintando pixel en ({x}, {y})")
-        
-    personaje_anterior = []  # Limpiar la lista de puntos del personaje
-    
-def reimprimir_personaje(win, pixel_size=2):
-    # Borra el personaje anterior
-    limpiar_personaje(win, pixel_size)
 
-    # Redibuja el personaje en la nueva posición
-    for x, y in personaje_posterior:
-        print(f"Dibujando pixel en ({x}, {y})")
-        draw_pixel(x, y, win, pixel_size)
-    print("Saliendo de reimprimir_personaje")
-
-def personaje(xc=5, xy=5, r=3, win=None, pixel_size=2):
-    print('\n Saliendo...')
+# Añade una lista para almacenar los elementos del personaje
+personaje_elementos = []
+def undraw_personaje(win):
+    global personaje_elementos
+    for elemento in personaje_elementos:
+        x, y = elemento  # Extrae x e y de la tupla
+        undraw_pixel(x, y, win, pixel_size = 2)
+    personaje_elementos = []
+    vaciar_personaje()
+        
+def ver_personaje_elementos():
+    global personaje_elementos
+    if not personaje_elementos:
+        print("personaje_elementos está vacío.")
+    else:
+        print("Contenido de personaje_elementos:")
+        for i, elemento in enumerate(personaje_elementos, start=1):
+            print(f"Elemento {i}: {elemento}")
+            
+def personaje(xc=5, xy=5, r=3, largo_cuerpo = -5, win=None, pixel_size=2):
+    global personaje_elementos  # Usamos una lista global para almacenar los elementos
+    personaje_elementos = [] 
+    
+    print('\n Creando personaje...')
     partidacuello = xy-r
-    largo_cuerpo= -5
 
-    # Limpiar los puntos del personaje anterior antes de dibujar el nuevo
-    limpiar_personaje(win, pixel_size)
-    
     # Dibuja cabeza
     CircleBresenham(xc, xy, r, win, pixel_size)
+    
+    
     # Dibuja cuerpo
     LineaBresenham(xc, partidacuello, xc, largo_cuerpo, win, pixel_size)
+    
     # Dibuja brazos
     LineaBresenham(xc + 3, partidacuello - 2, xc - 4, partidacuello - 2, win, pixel_size)
-    # Dibuja pierna izquierda
-    LineaBresenham(xc, largo_cuerpo, xc - 4, largo_cuerpo - 4, win, pixel_size)
-    # Dibuja pierna derecha
-    LineaBresenham(xc, largo_cuerpo, xc + 4, largo_cuerpo - 4, win, pixel_size)
-
-    # Actualizar los puntos del personaje actual
-    global personaje_posterior
-    personaje_posterior = get_personaje_puntos()
+    LineaBresenham(xc - 4, partidacuello - 2, xc + 3, partidacuello - 2, win, pixel_size)
     
+    
+    # Dibuja pierna izquierda e derecha
+    LineaBresenham(xc, largo_cuerpo, xc - 4, largo_cuerpo - 4, win, pixel_size)
+    LineaBresenham(xc, largo_cuerpo, xc + 4, largo_cuerpo - 4, win, pixel_size)
+    personaje_elementos = get_personaje_puntos()
+
 def Rotacion(win):
     print('\nRotación...')
     angle_deg = leer_variable("Introduce el ángulo de rotación en grados:")
@@ -117,12 +109,17 @@ def Rotacion(win):
         draw_pixel(x * 2, y * 2, win, 2, "red")  # Dibujar cada punto en rojo
 
     
-def Traslacion(dx, dy, win):
+def Traslacion(win, xc, xy, desplazamiento_x=0, desplazamiento_y=0, largo_personaje= -5):
     print('\n Traslacion...')
-    for i, (x, y) in enumerate(personaje_posterior):
-        personaje_posterior[i] = (x + dx, y + dy)
-        personaje_anterior.append((x,y))
-    reimprimir_personaje(win,)
+    ver_personaje_elementos()
+    undraw_personaje(win)
+    xc_nuevo = xc + desplazamiento_x
+    xy_nuevo = xy + desplazamiento_y
+
+    nuevo_largo = largo_personaje + desplazamiento_y
+        
+    personaje(xc=xc_nuevo, xy=xy_nuevo, largo_cuerpo = nuevo_largo, win=win)
+    return xc_nuevo, xy_nuevo, nuevo_largo
     
 def Escalamiento(win):
     print('\n Escalamiento...')
@@ -157,10 +154,15 @@ def main():
     x_position = 350
     y_start = 50
     spacing = 40
-
+    xc = 5
+    xy = 5
+    r = 3
+    largo_cuerpo = -5
+    
     # Inicializar la ventana
     win = GraphWin("Stickman with Pixel Grid", width, height)
     win.setCoords(-width // 2, -height // 2, width // 2, height // 2)
+    win.setBackground("white")
 
     # LLamar al menu
     print("\n\tBienvenidos al Programa de Representaciones Graficas")
@@ -227,21 +229,16 @@ def main():
             click_point = win.getMouse()
             
             if crear_personaje_button.is_clicked(click_point):
-                personaje(win=win, xc=5, xy=5)
+                personaje(xc, xy, r, largo_cuerpo, win)
                 print("El personaje fue dibujado")
                 
                 traslacion_button.activate()
                 rotacion_button.activate()
                 escalamiento_button.activate()
                 escalamiento_button_plus.activate()
-                escalamiento_button_minus.activate()  
-                traslacion_button_left.activate()
-                traslacion_button_down.activate()
-                traslacion_button_top.activate()
-                traslacion_button_right.activate()
-                
-                crear_personaje_button.cambiar_texto(win, Point(x_position, y_start + 3 * spacing))
+                escalamiento_button_minus.activate()    
                 botones_activos = 1
+                
 
             elif rotacion_button.is_clicked(click_point):
                 if botones_activos == 1:
@@ -265,22 +262,22 @@ def main():
             elif traslacion_button_left.is_clicked(click_point):
                 if botones_activos == 1:
                     print("Botón izquierda de traslación clicado!")
-                    Traslacion(-5,0,win)
+                    xc, xy, largo_cuerpo = Traslacion(win, xc, xy, desplazamiento_x = -5, largo_personaje = largo_cuerpo)
                     
             elif traslacion_button_top.is_clicked(click_point):
                 if botones_activos == 1:
                     print("Botón arriba de traslación clicado!")
-                    Traslacion(0,5,win)
+                    xc, xy, largo_cuerpo = Traslacion(win, xc, xy, desplazamiento_y = 5, largo_personaje = largo_cuerpo)
                     
             elif traslacion_button_down.is_clicked(click_point):
                 if botones_activos == 1:
                     print("Botón abajo de traslación clicado!")
-                    Traslacion(0,-5,win)
+                    xc, xy, largo_cuerpo = Traslacion(win, xc, xy, desplazamiento_y = -5, largo_personaje = largo_cuerpo)
                     
             elif traslacion_button_right.is_clicked(click_point):
                 if botones_activos == 1:
                     print("Botón derecha de traslación clicado!")
-                    Traslacion(5,0,win)
+                    xc, xy, largo_cuerpo = Traslacion(win, xc, xy, desplazamiento_x = 5, largo_personaje = largo_cuerpo)
                     
             elif salir_button.is_clicked(click_point):
                 win.close()
